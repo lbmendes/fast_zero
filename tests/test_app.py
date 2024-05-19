@@ -42,6 +42,18 @@ def test_create_user_must_return_bad_request_when_user_exists(client, user):
     response = client.post(
         '/users/',
         json={
+            'username': 'Outro_Teste',
+            'email': 'teste@test.com',
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
+def test_create_user_must_return_bad_request_when_email_exists(client, user):
+    response = client.post(
+        '/users/',
+        json={
             'username': 'Teste',
             'email': 'outro_email@example.com',
             'password': 'secret',
