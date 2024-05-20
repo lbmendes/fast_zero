@@ -2,11 +2,7 @@ import pytest
 from fastapi import HTTPException
 from jwt import decode
 
-from fast_zero.security import (
-    SECRET_KEY,
-    create_access_token,
-    get_current_user,
-)
+from fast_zero.security import create_access_token, get_current_user, settings
 
 pytest_plugins = ('pytest_asyncio',)
 
@@ -15,7 +11,7 @@ def test_jwt():
     data = {'test': 'test'}
     token = create_access_token(data)
 
-    decoded = decode(token, SECRET_KEY, algorithms=['HS256'])
+    decoded = decode(token, settings.SECRET_KEY, algorithms=['HS256'])
 
     assert decoded['test'] == data['test']
     assert decoded['exp']  # Testa se o valor de exp foi adicionado ao token
