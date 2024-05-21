@@ -24,7 +24,7 @@ def test_create_user_must_return_bad_request_when_user_exists(client, user):
     response = client.post(
         '/users/',
         json={
-            'username': 'Outro_Teste',
+            'username': user.username,
             'email': 'teste@test.com',
             'password': 'secret',
         },
@@ -37,7 +37,7 @@ def test_create_user_must_return_bad_request_when_email_exists(client, user):
         '/users/',
         json={
             'username': 'Teste',
-            'email': 'outro_email@example.com',
+            'email': user.email,
             'password': 'secret',
         },
     )
@@ -60,8 +60,8 @@ def test_read_user(client, user):
     response = client.get('/users/1')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'Teste',
-        'email': 'teste@test.com',
+        'username': user.username,
+        'email': user.email,
         'id': 1,
     }
 
@@ -90,9 +90,7 @@ def test_update_user(client, user, token):
     }
 
 
-def test_update_user_must_return_error_when_update_other_user(
-    client, user, other_user, token
-):
+def test_update_user_with_wrong_user(client, other_user, token):
     response = client.put(
         f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
@@ -102,8 +100,8 @@ def test_update_user_must_return_error_when_update_other_user(
             'password': 'mynewpassword',
         },
     )
-
     assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Not enough permissions'}
 
 
 def test_delete_user(client, user, token):
@@ -116,12 +114,10 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_user_must_return_error_when_delete_other_user(
-    client, user, other_user, token
-):
+def test_delete_user_wrong_user(client, other_user, token):
     response = client.delete(
         f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
-
     assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Not enough permissions'}
