@@ -34,7 +34,10 @@ def client(session):
 
 @pytest.fixture()
 def session():
-    engine = create_engine(Settings().DATABASE_URL)
+    DATABASE_URL = Settings().DATABASE_URL
+    TEST_DB = 'test'
+    TEST_DATABASE_URL = DATABASE_URL[:DATABASE_URL.rfind('/')] + '/' + TEST_DB
+    engine = create_engine(TEST_DATABASE_URL)
     table_registry.metadata.create_all(engine)
 
     with Session(engine) as session:
